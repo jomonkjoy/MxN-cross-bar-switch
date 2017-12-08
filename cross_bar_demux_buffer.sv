@@ -38,7 +38,7 @@ module cross_bar_demux_buffer #(
         IDLE : begin
           if (s_axis_tvalid) begin
             state <= ACTIVE;
-            channel_sel <= 1 << s_axis_tdata[MSEL_WIDTH-1:0];
+            channel_sel <= 1'b1 << s_axis_tdata[MSEL_WIDTH-1:0];
             channel_bin <= s_axis_tdata[MSEL_WIDTH-1:0];
           end
         end
