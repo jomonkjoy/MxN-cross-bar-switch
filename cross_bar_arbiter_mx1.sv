@@ -1,3 +1,4 @@
+// ARBITER using True-Round-Robin sheduling algorithm
 module cross_bar_arbiter_mx1 #(
   parameter MSEL_WIDTH = 2,
   parameter CHANNEL_NO = 2**MSEL_WIDTH,
