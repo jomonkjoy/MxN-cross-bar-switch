@@ -19,26 +19,41 @@ module cross_bar_dff_arbiter_mx1 #(
   input  logic                  m_axis_tready
 );
   
-  typedef enum {IDLE,ACTIVE}state_type;
+  typedef enum logic[1:0] {INIT,IDLE,ACTIVE}state_type;
   state_type state;
   
   logic [MSEL_WIDTH-1:0] channel_bin;
   logic [CHANNEL_NO-1:0] channel_sel;
   logic [CHANNEL_NO-1:0] channel_sel_valid;
+  logic [DATA_WIDTH-1:0] deficit_count[CHANNEL_NO];
   
   always_ff @(posedge aclk) begin
     if (areset) begin
-      state <= IDLE;
+      state <= INIT;
       channel_sel <= {{CHANNEL_NO-1{1'b0}},1'b1};
       channel_bin <= {MSEL_WIDTH{1'b0}};
     end else begin
       case (state)
+        INIT : begin
+          if (channel_bin >= CHANNEL_NO-1) begin
+            channel_bin <= {MSEL_WIDTH{1'b0}};
+            state <= IDLE;
+          end else begin
+            channel_bin <= channel_bin + 1;
+            deficit_count[channel_bin] <= s_axis_credit[channel_bin];
+          end
+        end
         IDLE : begin
-          if (|channel_sel_valid) begin
+          if (|channel_sel_valid && deficit_count[channel_bin] >= s_axis_tdata[channel_bin]) begin
             state <= ACTIVE;
+            deficit_count[channel_bin] <= deficit_count[channel_bin] - s_axis_tdata[channel_bin];
+          end else if (|channel_sel_valid) begin
+            channel_sel <= {channel_sel[CHANNEL_NO-2:0],channel_sel[CHANNEL_NO-1]};
+            channel_bin <= channel_bin + 1;
           end else begin
             channel_sel <= {channel_sel[CHANNEL_NO-2:0],channel_sel[CHANNEL_NO-1]};
             channel_bin <= channel_bin + 1;
+            deficit_count[channel_bin] <= {DATA_WIDTH{1'b0}};
           end
         end
         ACTIVE : begin
@@ -49,7 +64,7 @@ module cross_bar_dff_arbiter_mx1 #(
           end
         end
         default : begin
-          state <= IDLE;
+          state <= INIT;
           channel_sel <= {{CHANNEL_NO-1{1'b0}},1'b1};
           channel_bin <= {MSEL_WIDTH{1'b0}};
         end
