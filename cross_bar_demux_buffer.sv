@@ -17,7 +17,7 @@ module cross_bar_demux_buffer #(
   input  logic                  m_axis_tready[CHANNEL_NO]
 );
   
-  typedef enum {IDLE,ACTIVE}state_type;
+  typedef enum logic {IDLE,ACTIVE}state_type;
   state_type state;
   
   logic [DATA_WIDTH-1:0] s_fifo_tdata [CHANNEL_NO];
