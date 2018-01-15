@@ -18,7 +18,7 @@ module cross_bar_arbiter_mx1 #(
   input  logic                  m_axis_tready
 );
   
-  typedef enum {IDLE,ACTIVE}state_type;
+  typedef enum logic {IDLE,ACTIVE}state_type;
   state_type state;
   
   logic [MSEL_WIDTH-1:0] channel_bin;
