@@ -63,7 +63,7 @@ module cross_bar_arbiter_mx1 #(
   end endgenerate
   
   assign m_axis_tdata  = s_axis_tdata[channel_bin];
-  assign m_axis_tlast  = state == ACTIVE ? m_axis_tlast [channel_bin] : 1'b0;
-  assign m_axis_tvalid = state == ACTIVE ? m_axis_tvalid[channel_bin] : 1'b0;
+  assign m_axis_tlast  = state == ACTIVE ? s_axis_tlast [channel_bin] : 1'b0;
+  assign m_axis_tvalid = state == ACTIVE ? s_axis_tvalid[channel_bin] : 1'b0;
   
 endmodule
